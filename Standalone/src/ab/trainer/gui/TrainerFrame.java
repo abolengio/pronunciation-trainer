@@ -11,19 +11,20 @@ import java.io.FileNotFoundException;
 
 public class TrainerFrame  {
 
-    JFrame mainFrame = new JFrame("Pronunciation Trainer");
-
     JTextField t1 = new JTextField(20);
     JLabel l1 = new JLabel("Name here: ");
 
     private Trainer trainer;
+    private FileChooser fileChooser;
     private FrameActionListener actionListener;
 
-    public TrainerFrame(Trainer trainer)
+    public TrainerFrame(Trainer trainer, JFrame mainFrame, FileChooser fileChooser )
     {
         this.trainer = trainer;
+        this.fileChooser = fileChooser;
         this.actionListener = new FrameActionListener(trainer);
         JPanel contentPanel = new JPanel(new GridLayout(4, 1));
+        mainFrame.setTitle("Pronunciation Trainer");
         addContent(contentPanel);
         mainFrame.add(contentPanel);
         mainFrame.setSize(450, 150);
@@ -63,20 +64,7 @@ public class TrainerFrame  {
     }
 
     private void selectOriginlaFile() {
-        JFileChooser chooser = new JFileChooser();
-        // Note: source for ExampleFileFilter can be found in FileChooserDemo,
-        // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-        /*
-                ExampleFileFilter filter = new ExampleFileFilter();
-                filter.addExtension("mp3");
-                filter.setDescription("JPG & GIF Images");
-                chooser.setFileFilter(filter);
-        */
-        int returnVal = chooser.showOpenDialog(this.mainFrame);
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = chooser.getSelectedFile();
-            setFile(selectedFile);
-        }
+        fileChooser.selectFile(actionListener);
     }
 
     private void setFile(File selectedFile) {
@@ -87,7 +75,7 @@ public class TrainerFrame  {
         }
     }
 
-    public class FrameActionListener implements ActionListener {
+    public class FrameActionListener implements ActionListener, FileSelectedListener {
 
         static final String OPEN_FILE_PICKER = "openfilepickerfororiginalfile";
         static final String PLAY_FORWARD = "playforward";
@@ -128,5 +116,14 @@ public class TrainerFrame  {
                 trainer.stopRecording();
             }
         }
+
+        @Override
+        public void fileSelected(File selectedFile) {
+            try {
+                trainer.setOriginalFilePath(selectedFile);
+            } catch (FileNotFoundException exc) {
+                exc.printStackTrace();
+            }
+       }
     }
 }
