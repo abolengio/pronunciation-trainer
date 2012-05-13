@@ -1,5 +1,5 @@
 import ab.trainer.Trainer;
-import gui.TrainerFrame;
+import ab.trainer.gui.TrainerFrame;
 import javax.media.Format;
 import javax.media.Manager;
 import javax.media.MediaLocator;
