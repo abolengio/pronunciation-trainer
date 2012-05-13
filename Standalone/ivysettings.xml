@@ -1,0 +1,28 @@
+<ivysettings>
+    <properties file="${ivy.settings.dir}/ivysettings.properties" />
+    <settings defaultResolver="xugglecode" />
+    <caches  defaultCacheDir="${cache.dir}"/>
+    <resolvers>
+        <ibiblio name="ibiblio" />
+        <filesystem name="internal">
+            <ivy pattern="${repository.dir}/[module]/ivy-[revision].xml" />
+            <artifact pattern="${repository.dir}/[module]/[artifact]-[revision].[ext]" />
+        </filesystem>
+        <url m2compatible="true" name="xugglecode">
+            <ivy pattern="http://xuggle.googlecode.com/svn/trunk/repo/share/java/[organization]/[artifact]/[revision]/ivy-[revision].xml"/>
+            <ivy pattern="http://xuggle.googlecode.com/svn/trunk/repo/share/java/[organization]/[artifact]/ivy-[revision].xml"/>
+            <artifact pattern="http://xuggle.googlecode.com/svn/trunk/repo/share/java/[organisation]/[artifact]/[revision]/[artifact](-[revision]).[ext]" />
+            <artifact pattern="http://xuggle.googlecode.com/svn/trunk/repo/share/java/[organisation]/[artifact]/[artifact](-[revision]).[ext]" />
+            <artifact pattern="http://xuggle.googlecode.com/svn/trunk/repo/share/java/[organisation]/[artifact](-[revision]).[ext]" />
+            <artifact pattern="http://xuggle.googlecode.com/svn/trunk/repo/share/java/[artifact](-[revision]).[ext]" />
+            <artifact pattern="http://build.xuggle.com/view/Stable/job/red5_jdk6_stable/lastSuccessfulBuild/artifact/workingcopy/dist/[artifact].[ext]" />
+        </url>
+        <chain name="default" changingPattern=".*SNAPSHOT">
+            <!-- Make sure you use the xugglecode resolver when trying to resolve -->
+            <resolver ref="xugglecode"/>
+        </chain>
+    </resolvers>
+    <modules>
+        <module organisation="jayasoft" name=".*" resolver="internal" />
+    </modules>
+</ivysettings>
