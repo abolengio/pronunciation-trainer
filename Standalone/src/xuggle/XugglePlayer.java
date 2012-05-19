@@ -164,7 +164,7 @@ public class XugglePlayer implements MP3Player
                         * We also pass in a buffer size (1024 in our example), although Xuggler
                         * will probably allocate more space than just the 1024 (it's not important why).
                         */
-                        IAudioSamples samples = IAudioSamples.make(1024, audioCoder.getChannels());
+                        IAudioSamples samples = IAudioSamples.make(4096, audioCoder.getChannels());
 
                         /*
                         * A packet can actually contain multiple sets of samples (or frames of samples

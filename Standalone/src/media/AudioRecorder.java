@@ -39,20 +39,18 @@ package media;
 |<---            this code is formatted to fit into 80 columns             --->|
 */
 
+import media.utils.SoundStreamAmplifier;
+
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.TargetDataLine;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Mixer;
-import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.*;
 
 /*	If the compilation fails because this class is not available,
 	get gnu.getopt from the URL given in the comment below.
@@ -152,9 +150,9 @@ public class AudioRecorder
                             AudioFormat.Encoding.PCM_UNSIGNED, 32, true),
             };
 
-    private static final String	DEFAULT_FORMAT = "s16_le";
-    private static final int	DEFAULT_CHANNELS = 2;
-    private static final float	DEFAULT_RATE = 44100.0F;
+    private static final String	DEFAULT_FORMAT = "u8";
+    private static final int	DEFAULT_CHANNELS = 1;
+    private static final float	DEFAULT_RATE = 22050.0F;
     private static final AudioFileFormat.Type	DEFAULT_TARGET_TYPE = AudioFileFormat.Type.WAVE;
 
     private static boolean		sm_bDebug = false;
@@ -181,7 +179,7 @@ public class AudioRecorder
         boolean	bDirectRecording = true;
 
         /*
-           *	We make shure that there is only one more argument, which
+           *	We make sure that there is only one more argument, which
            *	we take as the filename of the soundfile to store to.
            */
         String	strFilename = "/home/ab/test.wav";
@@ -348,6 +346,8 @@ public class AudioRecorder
         Recorder recorder = null;
         if (bDirectRecording)
         {
+
+            Control[] controls = targetDataLine.getControls();
             recorder = new DirectRecorder(
                     targetDataLine,
                     targetType,
@@ -504,6 +504,25 @@ public class AudioRecorder
     }
 
 
+    public static class ApmlifyingAudioInputStream extends AudioInputStream {
+
+        private SoundStreamAmplifier amplifier = new SoundStreamAmplifier();
+        private double level = 1.0;
+
+        public ApmlifyingAudioInputStream(TargetDataLine targetDataLine) {
+            super(targetDataLine);
+        }
+
+        @Override
+        public int read(byte[] buffer, int startIndex, int length) throws IOException {
+            System.out.println(String.format("read 3: buffer size=%d startIndex=%d length=%d", buffer.length, startIndex, length));
+            byte[] unamplified = new byte[buffer.length];
+            int byteRead = super.read(unamplified, startIndex, length);
+            amplifier.amplify(unamplified, buffer, 10.0);
+            return byteRead;
+        }
+    }
+
 
     public static class DirectRecorder
             extends AbstractRecorder
@@ -517,7 +536,7 @@ public class AudioRecorder
                               File file)
         {
             super(line, targetType, file);
-            m_audioInputStream = new AudioInputStream(line);
+            m_audioInputStream = new ApmlifyingAudioInputStream(line);
         }
 
 
