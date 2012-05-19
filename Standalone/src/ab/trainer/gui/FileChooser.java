@@ -17,14 +17,6 @@ public class FileChooser {
     }
 
     public void selectFile(FileSelectedListener fileSelectedListener) {
-        // Note: source for ExampleFileFilter can be found in FileChooserDemo,
-        // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-        /*
-                ExampleFileFilter filter = new ExampleFileFilter();
-                filter.addExtension("mp3");
-                filter.setDescription("JPG & GIF Images");
-                chooser.setFileFilter(filter);
-        */
         JFileChooser chooser = new JFileChooser();
         String lastOpenedDirStr = propertiesProvider.get(ApplicationProperty.lastOpenedDirectory);
         if(lastOpenedDirStr != null){

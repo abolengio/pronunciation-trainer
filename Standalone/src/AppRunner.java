@@ -12,6 +12,6 @@ public class AppRunner {
         JFrame applicationFrame = new JFrame();
         PropertiesProvider propertiesProvider = new PropertiesProvider("/home/ab/.pronunciation-trainer/user.properties");
         FileChooser fileChooser = new FileChooser(applicationFrame, propertiesProvider);
-        new TrainerFrame(trainer, applicationFrame, fileChooser);
+        new TrainerFrame(trainer, applicationFrame, fileChooser, propertiesProvider);
     }
 }

@@ -1,5 +1,7 @@
 package ab.trainer.gui;
 
+import ab.trainer.ApplicationProperty;
+import ab.trainer.PropertiesProvider;
 import ab.trainer.Trainer;
 
 import javax.swing.*;
@@ -11,17 +13,19 @@ import java.io.FileNotFoundException;
 
 public class TrainerFrame  {
 
-    JTextField t1 = new JTextField(20);
+    JTextField fileNameField = new JTextField(20);
     JLabel l1 = new JLabel("Name here: ");
 
     private Trainer trainer;
     private FileChooser fileChooser;
+    private PropertiesProvider propertiesProvider;
     private FrameActionListener actionListener;
 
-    public TrainerFrame(Trainer trainer, JFrame mainFrame, FileChooser fileChooser )
+    public TrainerFrame(Trainer trainer, JFrame mainFrame, FileChooser fileChooser, PropertiesProvider propertiesProvider)
     {
         this.trainer = trainer;
         this.fileChooser = fileChooser;
+        this.propertiesProvider = propertiesProvider;
         this.actionListener = new FrameActionListener(trainer);
         JPanel contentPanel = new JPanel(new GridLayout(4, 1));
         mainFrame.setTitle("Pronunciation Trainer");
@@ -30,7 +34,20 @@ public class TrainerFrame  {
         mainFrame.setSize(450, 150);
         mainFrame.setVisible(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setFile(new File("/home/ab/Music/C-Music/AudioBooks/French/Echo/A1/010_L1_page 11.mp3"));
+        setDefaults();
+    }
+
+    private void setDefaults() {
+        String lastOpenedFile = propertiesProvider.get(ApplicationProperty.lastOpenedFile);
+        if(lastOpenedFile != null) {
+            File selectedFile = new File(lastOpenedFile);
+            if(selectedFile.exists() && selectedFile.canRead()) {
+                actionListener.fileSelected(selectedFile);
+            } else {
+                propertiesProvider.remove(ApplicationProperty.lastOpenedFile);
+            }
+        }
+        
     }
 
     private void addContent(JPanel contentPanel) {
@@ -39,7 +56,7 @@ public class TrainerFrame  {
 
         selectFileButtons.add(addButton("Select file", FrameActionListener.OPEN_FILE_PICKER));
         selectFileButtons.add(l1);
-        selectFileButtons.add(t1);
+        selectFileButtons.add(fileNameField);
         contentPanel.add(selectFileButtons);
         final JPanel playCutButtons = new JPanel(new FlowLayout());
         playCutButtons.add(addButton("Play forward", FrameActionListener.PLAY_FORWARD));
@@ -65,14 +82,6 @@ public class TrainerFrame  {
 
     private void selectOriginlaFile() {
         fileChooser.selectFile(actionListener);
-    }
-
-    private void setFile(File selectedFile) {
-        try {
-            trainer.setOriginalFilePath(selectedFile);
-        } catch (FileNotFoundException exc) {
-            exc.printStackTrace();
-        }
     }
 
     public class FrameActionListener implements ActionListener, FileSelectedListener {
@@ -121,6 +130,8 @@ public class TrainerFrame  {
         public void fileSelected(File selectedFile) {
             try {
                 trainer.setOriginalFilePath(selectedFile);
+                fileNameField.setText(selectedFile.getPath());
+                propertiesProvider.set(ApplicationProperty.lastOpenedFile, selectedFile.getPath());
             } catch (FileNotFoundException exc) {
                 exc.printStackTrace();
             }

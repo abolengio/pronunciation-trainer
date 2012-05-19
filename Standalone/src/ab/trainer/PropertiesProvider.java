@@ -31,15 +31,26 @@ public class PropertiesProvider {
     }
 
     public String get(ApplicationProperty applicationProperty) {
-        return properties.getProperty(applicationProperty.name());
+        return properties.getProperty(applicationProperty.getValue());
     }
 
     public void set(ApplicationProperty applicationProperty, String value) {
+        if(!value.equals(get(applicationProperty)) ) {
+            properties.setProperty(applicationProperty.getValue(), value);
+            flashProperties();
+        }
+    }
+
+    private void flashProperties() {
         try {
-            properties.setProperty(applicationProperty.name(), value);
-            properties.store(new FileWriter(propertiesFilePath), "ab");
+            properties.store(new FileWriter(propertiesFilePath), "ab");  //todo use current user details
         } catch(IOException e) {
             throw new RuntimeException(format("Failed to save properties to file %s", propertiesFilePath), e);
         }
+    }
+
+    public void remove(ApplicationProperty property) {
+        properties.remove(property.getValue());
+        flashProperties();
     }
 }
